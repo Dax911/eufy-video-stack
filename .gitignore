@@ -1,0 +1,43 @@
+# Secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Recordings
+recordings/*
+!recordings/.gitkeep
+*.mkv
+*.mp4
+*.avi
+*.mov
+*.ts
+*.flv
+
+# Research artifacts (may contain sensitive data)
+research-output/
+*.pcap
+*.pcapng
+*.cap
+*.har
+*.sdp
+capture-notes-raw.md
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+
+# Docker volumes
+volumes/

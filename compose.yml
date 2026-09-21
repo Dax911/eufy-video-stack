@@ -1,0 +1,59 @@
+services:
+  mediamtx:
+    image: bluenviron/mediamtx:latest
+    container_name: eufy-mediamtx
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8554:8554"   # RTSP
+      - "127.0.0.1:1935:1935"   # RTMP
+      - "127.0.0.1:8888:8888"   # HTTP API
+      - "127.0.0.1:8889:8889"   # WebRTC
+    volumes:
+      - ./mediamtx.yml:/mediamtx.yml:ro
+    environment:
+      - MTX_PROTOCOLS=tcp
+    networks:
+      - eufy-video
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8888"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  recorder:
+    image: linuxserver/ffmpeg:latest
+    container_name: eufy-recorder
+    restart: unless-stopped
+    depends_on:
+      mediamtx:
+        condition: service_healthy
+    volumes:
+      - ./scripts:/scripts:ro
+      - ${RECORDING_DIR:-./recordings}:/recordings
+    env_file: .env
+    environment:
+      - RECORDING_DIR=/recordings
+    entrypoint: ["/bin/bash"]
+    command: ["/scripts/record-stream.sh", "main"]
+    networks:
+      - eufy-video
+
+  healthcheck:
+    image: linuxserver/ffmpeg:latest
+    container_name: eufy-healthcheck
+    restart: unless-stopped
+    volumes:
+      - ./scripts:/scripts:ro
+      - ${RECORDING_DIR:-./recordings}:/recordings:ro
+    env_file: .env
+    environment:
+      - RELAY_URL=rtsp://mediamtx:8554/eufy
+      - RECORDING_DIR=/recordings
+    entrypoint: ["/bin/bash"]
+    command: ["-c", "while true; do /scripts/healthcheck.sh || true; sleep 60; done"]
+    networks:
+      - eufy-video
+
+networks:
+  eufy-video:
+    driver: bridge

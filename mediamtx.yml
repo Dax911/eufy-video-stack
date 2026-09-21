@@ -1,0 +1,45 @@
+# MediaMTX configuration for Eufy video relay
+# Docs: https://github.com/bluenviron/mediamtx
+
+# Logging
+logLevel: info
+logDestinations: [stdout]
+
+# RTSP server
+rtsp: yes
+protocols: [tcp]
+rtspAddress: :8554
+
+# RTMP server
+rtmp: yes
+rtmpAddress: :1935
+
+# HLS server
+hls: yes
+hlsAddress: :8888
+
+# WebRTC server
+webrtc: yes
+webrtcAddress: :8889
+webrtcLocalAddress: 127.0.0.1
+
+# Path definitions - upstream sources
+paths:
+  eufy:
+    # Primary camera stream (wide/bullet view)
+    # source: rtsp://user:pass@nvr_ip:554/path
+    # Set via environment or uncomment and fill in
+    sourceOnDemand: yes
+    sourceOnDemandStartTimeout: 10s
+    sourceOnDemandCloseAfter: 10s
+
+  eufy_ptz:
+    # PTZ camera stream
+    sourceOnDemand: yes
+    sourceOnDemandStartTimeout: 10s
+    sourceOnDemandCloseAfter: 10s
+
+  # Catch-all for testing
+  ~^.*$:
+    readUser:
+    readPass:

@@ -1,0 +1,16 @@
+[Unit]
+Description=Eufy Video Recorder
+After=docker.service network.target
+Requires=docker.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+WorkingDirectory=/opt/eufy-video-stack
+EnvironmentFile=/opt/eufy-video-stack/.env
+ExecStart=/usr/bin/docker compose -f compose.yml up --remove-orphans
+ExecStop=/usr/bin/docker compose -f compose.yml down
+
+[Install]
+WantedBy=multi-user.target
